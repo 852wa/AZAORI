@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AZAORI プレイグラウンド</title>
+<link rel="icon" type="image/svg+xml" href="./azaori-symbol.svg">
+<style>
+:root {
+  --bg: #edf1f1;
+  --panel: #ffffff;
+  --panel-2: #f5f8f8;
+  --line: #dbe2e2;
+  --text: #22201b;
+  --muted: #6f7a7a;
+  --brand: #db3b1c;
+  --brand-hover: #c2320f;
+  --brand-text: #ffffff;
+  --accent: #c2320f;
+  --accent-text: #ffffff;
+  --err: #b3261e;
+  --err-bg: #fbeae8;
+  --ok: #2f6f5e;
+  --gutter: #f2f6f6;
+  --cur-line: rgba(34, 32, 27, 0.05);
+  --space: rgba(219, 59, 28, 0.10);
+  --space-wide: rgba(47, 95, 138, 0.16);
+  --c-fn: #8a2f2f;
+  --c-name: #1d5fa8;
+  --c-str: #7a5520;
+  --c-num: #0f7b74;
+  --c-hira: #4d7a1f;
+  --c-comment: #9a958a;
+  --c-paren: #7a7568;
+  --c-ctl: #6b3fa0;
+  --c-ext: #a0522d;
+  --c-out: #2f6f5e;
+  --name-bg: #fff3b8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .06);
+  --mono: "BIZ UDGothic", "BIZ UDゴシック", "MS Gothic", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121616;
+    --panel: #1a1e1e;
+    --panel-2: #1f2424;
+    --line: #2f3636;
+    --text: #e6ecec;
+    --muted: #93a0a0;
+    --brand: #e5502f;
+    --brand-hover: #f0633f;
+    --brand-text: #ffffff;
+    --accent: #f0816a;
+    --accent-text: #2a1512;
+    --err: #ff8a80;
+    --err-bg: #3a2220;
+    --ok: #5fb49c;
+    --gutter: #171b1b;
+    --cur-line: rgba(255, 255, 255, 0.05);
+    --space: rgba(229, 80, 47, 0.16);
+    --space-wide: rgba(122, 170, 224, 0.20);
+    --c-fn: #f09a88;
+    --c-name: #8cbcf0;
+    --c-str: #dcb58c;
+    --c-num: #6fd3c9;
+    --c-hira: #a8d27a;
+    --c-comment: #77736a;
+    --c-paren: #9d988c;
+    --c-ctl: #cfa2ec;
+    --c-ext: #e8a878;
+    --c-out: #5fb49c;
+    --name-bg: rgba(255, 214, 102, 0.18);
+    --shadow: none;
+  }
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: "BIZ UDPGothic", "Yu Gothic UI", "Hiragino Sans", "Meiryo", sans-serif;
+  font-size: 14px; display: flex; flex-direction: column;
+}
+button, select {
+  font: inherit; color: var(--text); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 14px; cursor: pointer;
+}
+button:hover, select:hover { border-color: var(--muted); }
+button.primary { background: var(--brand); color: var(--brand-text); border-color: var(--brand); font-weight: bold; }
+button.primary:hover { background: var(--brand-hover); border-color: var(--brand-hover); }
+kbd { font-family: var(--mono); font-size: 11px; padding: 1px 4px; border: 1px solid currentColor; border-radius: 3px; opacity: .75; }
+[hidden] { display: none !important; }
+
+/* ---- 上の帯 ---- */
+header.top {
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; margin-right: 12px; }
+.brand img { width: 34px; height: 34px; display: block; }
+.brand b { font-size: 24px; letter-spacing: .03em; }
+.spacer { flex: 1; }
+.switch { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--text); user-select: none; }
+.switch input { appearance: none; width: 40px; height: 22px; border-radius: 11px; background: var(--line); position: relative; margin: 0; cursor: pointer; transition: background .15s; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.switch input:checked { background: var(--brand); }
+.switch input:checked::after { left: 21px; }
+#run { padding: 8px 26px; font-size: 17px; border-radius: 8px; }
+#run, #save, #samples, .switch, .icon-btn { white-space: nowrap; }
+@media (max-width: 1100px) { #run kbd { display: none; } }
+#run kbd { margin-left: 6px; }
+.icon-btn { border: none; background: none; color: var(--muted); padding: 6px 8px; }
+.icon-btn:hover { color: var(--text); }
+.menu-wrap { position: relative; }
+.popover {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 220px; padding: 10px 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.14);
+}
+.popover label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+.popover .legend { display: flex; gap: 12px; font-size: 12px; color: var(--muted); padding: 2px 0 2px 26px; }
+.legend .sw { display: inline-block; width: 14px; height: 12px; vertical-align: -1px; margin-right: 3px; border-radius: 2px; }
+.popover button.item { display: block; width: 100%; text-align: left; border: none; background: none; padding: 7px 8px; border-radius: 6px; }
+.popover button.item:hover { background: var(--gutter); }
+
+/* ---- 真ん中（エディタと結果） ---- */
+main { flex: 1; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 12px; padding: 12px 12px 0; min-height: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+.card-head { display: flex; align-items: flex-end; gap: 2px; padding: 0 8px; border-bottom: 1px solid var(--line); background: var(--panel-2); min-height: 44px; }
+.file-tab { display: flex; align-items: center; gap: 10px; padding: 10px 16px; margin-bottom: -1px; background: var(--panel); border: 1px solid var(--line); border-bottom-color: var(--panel); border-radius: 8px 8px 0 0; border-top: 2px solid var(--brand); font-size: 15px; }
+.file-tab .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text); }
+.tab { border: none; background: none; border-radius: 8px 8px 0 0; padding: 11px 20px; color: var(--muted); border-top: 3px solid transparent; font-size: 15px; margin-bottom: -1px; }
+.tab.active { color: var(--text); background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--brand); border-bottom-color: var(--panel); font-weight: bold; }
+.tab .chev { font-size: 11px; margin-left: 4px; }
+
+/* エディタ（色分けとスペースの見える化） */
+.editor { flex: 1; display: flex; min-height: 0; background: var(--panel); }
+#gutter {
+  padding: 12px 10px 12px 14px; text-align: right; color: var(--muted); background: var(--gutter);
+  font-family: var(--mono); font-size: 17px; line-height: 1.8; overflow: hidden; user-select: none; min-width: 50px;
+  border-right: 1px solid var(--line);
+}
+#gutter div.cur { color: var(--text); }
+#gutter div.err { color: var(--err); font-weight: bold; }
+.code { position: relative; flex: 1; min-width: 0; }
+#cur-line { position: absolute; left: 0; right: 0; height: calc(17px * 1.8); background: var(--cur-line); border-left: 3px solid var(--brand); pointer-events: none; }
+#highlight, #source {
+  position: absolute; inset: 0; margin: 0; padding: 12px 16px; border: none;
+  font-family: var(--mono); font-size: 17px; line-height: 1.8; tab-size: 2;
+  white-space: pre; overflow: auto; font-variant-ligatures: none;
+}
+#highlight { color: var(--text); pointer-events: none; overflow: hidden; }
+#source { background: transparent; color: transparent; caret-color: var(--text); resize: none; outline: none; }
+#source::selection { background: rgba(120, 120, 200, .3); }
+body.no-space .h-sp, body.no-space .h-wsp { background: none; }
+.h-fn { color: var(--c-fn); font-weight: bold; }
+.h-name { color: var(--c-name); background: var(--name-bg); border-radius: 3px; }
+.h-str { color: var(--c-str); }
+.h-num { color: var(--c-num); }
+.h-hira { color: var(--c-hira); }
+.h-comment { color: var(--c-comment); }
+.h-paren { color: var(--c-paren); }
+.h-sp { background: var(--space); border-radius: 2px; }
+.h-wsp { background: var(--space-wide); border-radius: 2px; }
+.h-ext { color: var(--c-ext); }
+.h-op { color: var(--c-num); font-weight: bold; }
+.h-out { color: var(--c-out); font-weight: bold; text-decoration: underline dotted; text-underline-offset: 3px; }
+/* 省略した主語: 補って読む値を、その字の上に薄く小さく重ねる（字の並びは変えないので、カーソルの位置はずれない） */
+.ghost { position: relative; }
+.ghost::before {
+  content: attr(data-ghost); position: absolute; left: 50%; bottom: 100%; transform: translate(-50%, 2px);
+  font-size: 11px; line-height: 1; font-weight: normal; color: var(--muted); opacity: .85; white-space: nowrap; pointer-events: none;
+}
+body.no-ghost .ghost::before { display: none; }
+.h-err { text-decoration: underline wavy var(--err); text-decoration-thickness: 2px; text-underline-offset: 4px; background: var(--err-bg); border-radius: 2px; }
+.h-ctl { color: var(--c-ctl); font-weight: bold; text-decoration: underline; text-underline-offset: 3px; }
+
+/* 右側 */
+.view { flex: 1; overflow: auto; padding: 14px 16px; display: none; background: var(--panel); }
+.view.active { display: block; }
+.empty { color: var(--muted); }
+.section { margin-bottom: 18px; }
+.section-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-weight: bold; font-size: 15px; cursor: pointer; user-select: none; }
+.section-head .tri { font-size: 11px; color: var(--muted); width: 12px; }
+.section-head .right { margin-left: auto; font-weight: normal; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.section.closed .section-body { display: none; }
+#status.ok { color: var(--ok); }
+#status.err { color: var(--err); }
+.result-box { border: 1px solid var(--line); border-radius: 8px; background: var(--panel-2); padding: 4px 14px; }
+.copy { padding: 3px 9px; font-size: 12px; }
+.error-box { margin: 10px 0 0; padding: 10px 12px; border-radius: 8px; background: var(--err-bg); color: var(--err); line-height: 1.6; }
+.error-box pre { margin: 6px 0 0; font-family: var(--mono); font-size: 12px; white-space: pre-wrap; }
+table.vars { border-collapse: collapse; width: 100%; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+table.vars th { background: var(--panel-2); color: var(--muted); font-weight: normal; text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+table.vars td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.vars tr:last-child td { border-bottom: none; }
+table.vars td.name { color: var(--c-name); white-space: nowrap; }
+table.vars td.value { font-family: var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+table.vars td.shape { color: var(--muted); white-space: nowrap; }
+.row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 10px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+.row:last-child { border-bottom: none; }
+.row .ln { font-family: var(--mono); color: var(--muted); text-align: right; font-size: 13px; padding-top: 2px; }
+.row .src { font-family: var(--mono); color: var(--muted); font-size: 14px; white-space: pre-wrap; }
+.row .out { grid-column: 2; font-family: var(--mono); font-size: 22px; line-height: 1.5; margin: 0; white-space: pre; overflow-x: auto; }
+.row .reading { grid-column: 2; font-size: 16px; line-height: 1.7; }
+.rv { background: var(--name-bg); border-radius: 3px; padding: 0 2px; cursor: pointer; border-bottom: 1px dotted var(--c-name); }
+.rv.shown { font-family: var(--mono); color: var(--c-num); }
+.rv.step { background: none; border-bottom: 1px dotted var(--muted); padding: 0; }
+.rv.hot { outline: 2px solid var(--c-name); outline-offset: 1px; }
+.rv.step.err { border-bottom: 2px wavy var(--err); background: var(--err-bg); }
+#value-tip {
+  position: fixed; z-index: 40; max-width: min(420px, calc(100vw - 32px)); padding: 6px 10px;
+  background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .15); font-size: 14px; line-height: 1.6; pointer-events: none;
+}
+#value-tip .k { color: var(--c-name); margin-right: 6px; }
+#value-tip .v { font-family: var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+#value-tip .m { color: var(--muted); font-size: 12px; }
+#value-tip .e { color: var(--err); }
+.row.ev-停 .out, .row.ev-待 .out, .row.ev-認 .out, .row.ev-終 .out { font-size: 16px; color: var(--muted); }
+.row.ev-入力 .out { font-size: 16px; color: var(--c-name); }
+.row .out.expanded { font-size: 15px; white-space: pre-wrap; }
+.note { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.badge { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 4px; background: var(--space-wide); color: var(--text); }
+.b-待, .b-認, .b-どれ, .b-入力 { background: rgba(77, 122, 31, .16); }
+.b-終 { background: rgba(107, 63, 160, .16); }
+#ask { margin-top: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--gutter); }
+#ask label { display: block; margin-bottom: 8px; font-size: 15px; }
+.ask-row { display: flex; gap: 8px; flex-wrap: wrap; }
+#ask-input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--text); }
+
+.tok-line { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.tok-line .ln { font-family: var(--mono); color: var(--muted); min-width: 28px; text-align: right; padding-top: 3px; }
+.tok-line .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { display: inline-flex; flex-direction: column; align-items: center; border-radius: 5px; padding: 2px 7px 1px; line-height: 1.3; border: 1px solid var(--line); }
+.chip b { font-family: var(--mono); font-size: 15px; font-weight: normal; }
+.chip small { font-size: 10px; color: var(--muted); }
+.k-FN b { color: var(--c-fn); font-weight: bold; }
+.k-NAME b { color: var(--c-name); }
+.k-STR b { color: var(--c-str); }
+.k-NUM b { color: var(--c-num); }
+.k-OP b { color: var(--c-num); font-weight: bold; }
+.k-WA b, .k-TOWA b { color: var(--c-hira); }
+#tree { font-family: var(--mono); font-size: 14px; line-height: 1.75; }
+#tree details, #tree .leaf { margin-left: 18px; }
+#tree > details, #tree > .leaf { margin-left: 0; }
+#tree summary { cursor: pointer; }
+#tree .ty { font-weight: bold; }
+#tree .fl { color: var(--muted); }
+#tree .at { color: var(--c-name); }
+#tree .field { margin-left: 18px; color: var(--muted); }
+#tree .field-list { margin-left: 18px; }
+#reference h3 { font-size: 14px; margin: 18px 0 6px; }
+#reference h3:first-child { margin-top: 0; }
+#reference pre { font-family: var(--mono); font-size: 15px; background: var(--gutter); padding: 8px 12px; border-radius: 6px; margin: 0; white-space: pre-wrap; }
+#reference p { margin: 6px 0; color: var(--muted); line-height: 1.6; }
+#reference table, #analysis table { border-collapse: collapse; width: 100%; font-size: 13px; }
+#reference th, #reference td, #analysis th, #analysis td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+#reference th, #analysis th { color: var(--muted); font-weight: normal; white-space: nowrap; }
+#analysis td.effects { font-size: 12px; }
+#reference h4 { font-size: 13px; margin: 14px 0 4px; }
+#reference ul { margin: 4px 0; padding-left: 20px; color: var(--muted); line-height: 1.7; font-size: 13px; }
+#reference .basic-list { font-family: var(--mono); font-size: 20px; color: var(--c-fn); }
+#reference td.mono { font-family: var(--mono); white-space: nowrap; }
+#reference .ref-code { font-family: var(--mono); font-size: 14px; cursor: pointer; border-bottom: 1px dotted var(--muted); }
+#reference .ref-code:hover { color: var(--accent); }
+#reference td.k { font-family: var(--mono); font-size: 17px; color: var(--c-fn); font-weight: bold; white-space: nowrap; }
+
+/* ---- 漢字パレット ---- */
+#palette-card { margin: 12px; flex-shrink: 0; height: 34vh; min-height: 200px; }
+.palette-head { display: flex; align-items: center; gap: 12px; padding: 10px 14px 6px; }
+.palette-head .title { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+.palette-head .title .grid { display: inline-grid; grid-template-columns: repeat(3, 5px); gap: 2px; }
+.palette-head .title .grid i { width: 5px; height: 5px; background: var(--text); border-radius: 1px; }
+.palette-head .sub { color: var(--muted); font-size: 13px; }
+#palette-search { margin-left: auto; width: min(340px, 40vw); font: inherit; padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--text); }
+.palette-tabs { display: flex; gap: 2px; padding: 0 14px; flex-wrap: wrap; }
+.ptab { border: 1px solid var(--line); border-radius: 8px; padding: 6px 18px; background: var(--panel-2); color: var(--text); }
+.ptab.active { background: #3f4a4a; color: #fff; border-color: #3f4a4a; }
+@media (prefers-color-scheme: dark) { .ptab.active { background: #e6ecec; color: #1a1e1e; border-color: #e6ecec; } }
+#palette { flex: 1; overflow: auto; padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+.pgroup { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px 10px; background: var(--panel-2); }
+.pgroup-name { font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+.pkeys { display: flex; flex-wrap: wrap; gap: 6px; }
+.pkey { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; min-width: 56px; padding: 6px 8px 5px; border-radius: 8px; background: var(--panel); line-height: 1.1; }
+.pkey b { font-family: var(--mono); font-size: 22px; color: var(--c-fn); }
+.pkey small { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.pkey.mod { border-style: dashed; }
+.pkey.sym b { color: var(--c-num); }
+.pkey.word b { color: var(--c-hira); }
+.palette-foot { display: flex; align-items: center; gap: 8px; padding: 6px 14px 8px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); min-height: 34px; }
+.palette-foot .hint { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex: 1; }
+.hint .cand { font-family: var(--mono); padding: 1px 8px; border-radius: 4px; border: 1px solid var(--line); color: var(--text); }
+.hint .cand b { color: var(--c-fn); font-size: 16px; }
+.hint .cand.first { border-color: var(--brand); }
+.hint .cand small { color: var(--muted); margin-left: 4px; }
+.link { border: none; background: none; color: var(--text); padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+body.no-palette #palette-card { display: none; }
+
+@media (max-width: 860px) {
+  /* 狭い画面: 画面全体を縦に送る（エディタ・結果・パレットをそれぞれの高さで並べる） */
+  html, body { height: auto; }
+  body { min-height: 100%; }
+  header.top { flex-wrap: wrap; row-gap: 6px; }
+  header.top .spacer { display: none; }
+  #run { margin-left: auto; padding: 7px 16px; }
+  .lbl { display: none; }
+  .brand b { font-size: 20px; }
+  .brand img { width: 28px; height: 28px; }
+  .brand { margin-right: 4px; }
+  main { grid-template-columns: 1fr; grid-template-rows: 46vh 52vh; flex: none; }
+  #palette-card { height: 60vh; }
+  #palette-search { width: 100%; margin-left: 0; }
+  .palette-head { flex-wrap: wrap; }
+  .tab { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="./azaori-symbol.svg" alt=""><b>AZAORI</b></div>
+  <select id="samples" title="標本（サンプル）を開く"></select>
+  <button id="save" title="このブラウザに保存">保存</button>
+  <div class="spacer"></div>
+  <label class="switch" title="書くたびに自動で実行する"><input type="checkbox" id="auto" checked> 自動実行</label>
+  <button id="stop" hidden>■ 止める</button>
+  <button id="run" class="primary">▶ 実行 <kbd>Ctrl+Enter</kbd></button>
+  <div class="spacer"></div>
+  <button id="help" class="icon-btn" title="文法メモを開く">？<span class="lbl"> ヘルプ</span></button>
+  <div class="menu-wrap">
+    <button id="settings" class="icon-btn" title="表示の設定">⚙<span class="lbl"> 設定</span></button>
+    <div id="settings-menu" class="popover" hidden>
+      <label><input type="checkbox" id="show-space" checked> スペースを色で示す</label>
+      <div class="legend"><span><span class="sw" style="background: var(--space)"></span>スペース</span><span><span class="sw" style="background: var(--space-wide)"></span>全角スペース</span></div>
+      <label><input type="checkbox" id="show-ghost" checked> 省略した主語を薄く表示する</label>
+      <label><input type="checkbox" id="show-palette" checked> 漢字パレットを表示する</label>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <div class="card-head">
+      <div class="file-tab"><span>▤</span><span id="file-name">無題.azo</span><span id="file-dirty" class="dot" hidden></span></div>
+    </div>
+    <div class="editor">
+      <div id="gutter"></div>
+      <div class="code">
+        <div id="cur-line"></div>
+        <pre id="highlight" aria-hidden="true"></pre>
+        <textarea id="source" spellcheck="false" autocomplete="off" wrap="off"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <button class="tab active" data-view="results">▥ 結果</button>
+      <button class="tab" data-view="readings">▤ 書き下し</button>
+      <div class="menu-wrap">
+        <button class="tab" id="more-tab">その他<span class="chev">▾</span></button>
+        <div id="more-menu" class="popover" hidden style="left: 0; right: auto;">
+          <button class="item" data-view="expanded">展開（主語の省略を書き出す）</button>
+          <button class="item" data-view="analysis">型と効果</button>
+          <button class="item" data-view="tokens">トークン</button>
+          <button class="item" data-view="tree">構文木</button>
+          <button class="item" data-view="reference">文法メモ</button>
+        </div>
+      </div>
+    </div>
+    <div class="view active" id="results">
+      <div class="section" id="sec-results">
+        <div class="section-head"><span class="tri">▼</span>実行結果
+          <span class="right"><span id="status">準備中…</span><button id="copy" class="copy" title="結果をコピーする">⧉ コピー</button></span>
+        </div>
+        <div class="section-body">
+          <div class="result-box"><div id="results-list"></div></div>
+          <div id="error-box" class="error-box" hidden></div>
+          <form id="ask" hidden>
+            <label for="ask-input"><span class="badge b-待" id="ask-badge">待</span> <span id="ask-prompt"></span></label>
+            <div class="ask-row" id="ask-text">
+              <input id="ask-input" autocomplete="off">
+              <button type="submit" class="primary">答える <kbd>Enter</kbd></button>
+            </div>
+            <div class="ask-row" id="ask-yesno">
+              <button type="button" class="primary" data-answer="はい">はい</button>
+              <button type="button" data-answer="いいえ">いいえ</button>
+            </div>
+            <div class="ask-row" id="ask-choice"></div>
+          </form>
+        </div>
+      </div>
+      <div class="section" id="sec-vars">
+        <div class="section-head"><span class="tri">▼</span>変数の状態</div>
+        <div class="section-body" id="vars"></div>
+      </div>
+    </div>
+    <div class="view" id="readings"></div>
+    <div class="view" id="expanded"></div>
+    <div class="view" id="tokens"></div>
+    <div class="view" id="tree"></div>
+    <div class="view" id="analysis"></div>
+    <div class="view" id="reference">
+      <p class="note">字の一覧・規則・例です。例はすべてテストで実際に動かして、結果を照合しています。例の書き方をクリックすると、エディタの末尾に入ります。</p>
+      <div id="reference-body"></div>
+    </div>
+  </section>
+</main>
+
+<section class="card" id="palette-card">
+  <div class="palette-head">
+    <span class="title"><span class="grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>漢字パレット</span>
+    <span class="sub">字をクリックすると、カーソルの位置に入ります</span>
+    <input id="palette-search" type="search" placeholder="字や意味で探す…（例: 合計、たす、sou）" autocomplete="off">
+  </div>
+  <div class="palette-tabs" id="palette-tabs"></div>
+  <div id="palette"></div>
+  <div class="palette-foot">
+    <div id="hint" class="hint"></div>
+    <button id="open-reference" class="link">📖 AZAORI リファレンス（文法メモ）</button>
+  </div>
+</section>
+
+<script src="./wasm-api.js"></script>
+<script>
+const fetch = window.azaoriFetch;
+const KIND_LABEL = { FN: "演算", NAME: "名前", STR: "文字列", EXT: "外の名前", NUM: "数", OP: "記号", LP: "括弧", RP: "括弧", WA: "は", TOWA: "とは" };
+const FIELD_LABEL = {
+  subject: "主語", steps: "手順", fn: "演算", right: "右", values: "数", text: "文字",
+  op: "記号", left: "左",
+  name: "名前", expr: "式", modifier: "前の字", base: "もとの演算", train: "操作", body: "行", line: "行番号",
+};
+const ERROR_LABEL = {
+  azaori: "エラー", language: "言語データのエラー",
+  wasm: "WebAssembly のエラー",
+  network: "サーバーにつながりません（npm run serve を実行してください）",
+};
+const DRAFT_KEY = "azaori-draft";
+
+const $ = (s) => document.querySelector(s);
+const source = $("#source"), highlight = $("#highlight"), gutter = $("#gutter"), statusBar = $("#status");
+let samples = [];
+let errorLine = null;
+let runId = 0;
+let timer = null;
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+// ---- エディタの色分け（スペースの見える化） ----
+const HL_PATTERN = /(※.*)|(【[^】\n]*】?)|(「[^」\n]*」?|『[^』\n]*』?|｢[^｣\n]*｣?)|(["“”＂][^"“”＂\n]*["“”＂]?)|([一-鿿々]+)|((?<![0-9０-９)）】」])-?[0-9０-９]+(?:[.．][0-9０-９]+)?)|(　+)|( +)|([ぁ-ゖ]+)|([()（）])|([+\-−×÷^*/＋－＊／＾])|([^])/g;
+const CONTROL_WORDS = new Set(["回", "止", "真", "偽", "停", "終"]);
+const OUTSIDE_WORDS = new Set(["置", "待", "認", "外", "外読", "外書"]);
+const HL_CLASS = [null, "h-comment", "h-name", "h-str", "h-ext", "h-fn", "h-num", "h-wsp", "h-sp", "h-hira", "h-paren", "h-op", null];
+
+let errorSpan = null;  // エラーになった字の場所 [始まり, 終わり)（エディタ全体の中の位置）
+
+function setErrorSpan(error) {
+  errorSpan = null;
+  if (error && error.line && error.col !== null && error.col !== undefined && error.col >= 0) {
+    const text = source.value, starts = lineStarts(text);
+    if (starts[error.line - 1] !== undefined) {
+      const lineEnd = error.line < starts.length ? starts[error.line] : text.length;
+      const lineText = text.slice(starts[error.line - 1], lineEnd).replace(LINE_BREAK, "");
+      const length = Array.from(lineText).length;
+      const point = Math.min(error.col, length);
+      const last = error.end > point ? Math.min(error.end, length) : Math.min(point + 1, length);
+      const col = offsetOf(text, starts, error.line, point), end = offsetOf(text, starts, error.line, last);
+      errorSpan = [col, Math.max(end, col + 1)];
+    }
+  }
+  renderHighlight();
+}
+
+function renderHighlight() {
+  const frag = document.createDocumentFragment();
+  const text = source.value;
+  let m;
+  HL_PATTERN.lastIndex = 0;
+  while ((m = HL_PATTERN.exec(text)) !== null) {
+    const group = m.findIndex((g, i) => i > 0 && g !== undefined);
+    let cls = HL_CLASS[group];
+    if (cls === "h-fn" && CONTROL_WORDS.has(m[0])) cls = "h-ctl";
+    if (cls === "h-fn" && OUTSIDE_WORDS.has(m[0])) cls = "h-out";
+    if (cls === "h-hira" && m[0] === "どれ") cls = "h-out";  // どれ は人に選んでもらう（外の世界）
+    appendSegment(frag, m[0], cls, m.index);
+  }
+  frag.append(document.createTextNode("\n"));  // 最後の改行のあとも高さをそろえる
+  highlight.replaceChildren(frag);
+  syncScroll();
+}
+
+// ---- 省略した主語（書いていないが、補って読む値）----
+let ghosts = [];          // [{at: エディタ全体の中の位置, text}]
+let ghostSource = null;   // ghosts を求めたときのソース（書き換えたあとは、解析が返るまで出さない）
+let analyzeTimer = null, analyzeId = 0;
+
+// 行の分け方は言語の字句解析（lexer.rs の source_lines）と同じにする
+const LINE_BREAK = /\r\n|[\n\r\u000b\u000c\u001c-\u001e\u0085\u2028\u2029]/g;
+function lineStarts(text) {
+  const starts = [0];
+  let m;
+  LINE_BREAK.lastIndex = 0;
+  while ((m = LINE_BREAK.exec(text)) !== null) starts.push(m.index + m[0].length);
+  return starts;
+}
+// 行番号（1から）と、その行の何文字目か（コードポイントで数える）を、エディタ全体の中の位置にする
+function offsetOf(text, starts, line, col) {
+  const start = starts[line - 1];
+  if (start === undefined) return null;
+  let offset = start;
+  for (let i = 0; i < col && offset < text.length; i++) offset += text.codePointAt(offset) > 0xffff ? 2 : 1;
+  return offset;
+}
+function setGhosts(elisions, text) {
+  const starts = lineStarts(text);
+  ghosts = [];
+  for (const e of elisions || []) {
+    const at = offsetOf(text, starts, e.line, e.col), to = offsetOf(text, starts, e.line, Math.max(e.end, e.col + 1));
+    if (at === null || at >= text.length) continue;
+    const shown = Array.from(e.text).length > 14 ? Array.from(e.text).slice(0, 13).join("") + "…" : e.text;
+    ghosts.push({ at, to: Math.min(to ?? at + 1, text.length), text: shown, full: e.text });
+  }
+  ghostSource = text;
+}
+function scheduleAnalyze() {
+  clearTimeout(analyzeTimer);
+  analyzeTimer = setTimeout(async () => {
+    const id = ++analyzeId, text = source.value;
+    let result;
+    try {
+      result = await (await fetch("/api/analyze", { method: "POST", body: JSON.stringify({ source: text }) })).json();
+    } catch { return; }
+    if (id !== analyzeId || text !== source.value) return;
+    setGhosts(result.elisions, text);
+    renderHighlight();
+  }, 120);
+}
+
+function appendSegment(frag, text, cls, start) {
+  // エラーの場所にかかる部分には赤い波線（h-err）を、省略した主語を補う字には薄い字（ghost）を重ねる
+  const end = start + text.length;
+  const cuts = new Set([start, end]);
+  if (errorSpan) for (const p of errorSpan) if (p > start && p < end) cuts.add(p);
+  const marks = new Map();
+  if (ghostSource === source.value) {
+    for (const g of ghosts) {
+      if (g.at < start || g.at >= end) continue;
+      cuts.add(g.at); cuts.add(Math.min(Math.max(g.to, g.at + 1), end));
+      marks.set(g.at, g);
+    }
+  }
+  const points = [...cuts].sort((a, b) => a - b);
+  for (let i = 0; i + 1 < points.length; i++) {
+    const [a, b] = [points[i], points[i + 1]];
+    const part = text.slice(a - start, b - start);
+    const err = errorSpan && a < errorSpan[1] && b > errorSpan[0];
+    const ghost = marks.get(a);  // 省略を重ねる字（演算1つ）
+    const c = [cls, err && "h-err", ghost && "ghost"].filter(Boolean).join(" ");
+    if (!c) { frag.append(document.createTextNode(part)); continue; }
+    const span = el("span", c, part);
+    if (ghost) {
+      span.dataset.ghost = ghost.text;
+      span.title = `（${ghost.full} ${part}…）と読みます`;
+    }
+    frag.append(span);
+  }
+}
+
+function syncScroll() {
+  highlight.scrollTop = source.scrollTop;
+  highlight.scrollLeft = source.scrollLeft;
+  gutter.scrollTop = source.scrollTop;
+  updateCurLine();
+}
+
+// ---- 今の行（カーソルのある行）を薄く目立たせる ----
+function currentLine() {
+  return source.value.slice(0, source.selectionStart).split("\n").length;
+}
+function updateCurLine() {
+  const bar = document.getElementById("cur-line");
+  if (!bar) return;
+  const lineHeight = parseFloat(getComputedStyle(source).lineHeight) || 30.6;
+  bar.style.top = `${12 + (currentLine() - 1) * lineHeight - source.scrollTop}px`;
+  const cur = currentLine();
+  gutter.querySelectorAll("div").forEach((d, i) => d.classList.toggle("cur", i + 1 === cur && !d.classList.contains("err")));
+}
+for (const ev of ["click", "keyup", "select", "focus"]) source.addEventListener(ev, updateCurLine);
+source.addEventListener("scroll", syncScroll);
+
+function updateGutter() {
+  const count = source.value.split("\n").length;
+  gutter.replaceChildren();
+  const cur = currentLine();
+  for (let i = 1; i <= count; i++) gutter.append(el("div", i === errorLine ? "err" : i === cur ? "cur" : "", String(i)));
+  gutter.scrollTop = source.scrollTop;
+}
+
+// ---- タブ（結果・書き下し・その他） ----
+const MORE_LABEL = { expanded: "展開", analysis: "型と効果", tokens: "トークン", tree: "構文木", reference: "文法メモ" };
+
+function showView(view) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.toggle("active", v.id === view));
+  document.querySelectorAll(".card-head .tab[data-view]").forEach((t) => t.classList.toggle("active", t.dataset.view === view));
+  const more = $("#more-tab");
+  more.classList.toggle("active", view in MORE_LABEL);
+  more.firstChild.textContent = view in MORE_LABEL ? `その他：${MORE_LABEL[view]}` : "その他";
+  $("#more-menu").hidden = true;
+}
+document.querySelectorAll(".card-head .tab[data-view]").forEach((tab) => {
+  tab.addEventListener("click", () => showView(tab.dataset.view));
+});
+$("#more-tab").addEventListener("click", (e) => {
+  e.stopPropagation();
+  $("#more-menu").hidden = !$("#more-menu").hidden;
+});
+$("#more-menu").addEventListener("click", (e) => {
+  const item = e.target.closest("[data-view]");
+  if (item) showView(item.dataset.view);
+});
+$("#help").addEventListener("click", () => showView("reference"));
+$("#open-reference").addEventListener("click", () => showView("reference"));
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".menu-wrap")) document.querySelectorAll(".popover").forEach((p) => (p.hidden = true));
+});
+document.querySelectorAll(".section-head").forEach((head) => {
+  head.addEventListener("click", (e) => {
+    if (e.target.closest("button")) return;
+    const section = head.parentElement;
+    section.classList.toggle("closed");
+    head.querySelector(".tri").textContent = section.classList.contains("closed") ? "▶" : "▼";
+  });
+});
+
+// ---- 実行（裏で動かし、途中経過を少しずつ受け取る） ----
+let currentRun = null;   // いま動いている実行のID
+const EVENT_BADGE = { "停": "停 途中の値", "待": "待 質問", "認": "認 確認", "どれ": "どれ 選択", "入力": "入力", "終": "終" };
+
+async function run() {
+  clearTimeout(timer);  // 予約していた自動実行は取り消す（サンプルを開いたときなどに二重に動かないように）
+  const id = ++runId;
+  currentRun = null;
+  const started = performance.now();
+  setRunning(true);
+  const lines = source.value.split(LINE_BREAK);
+  const runSource = source.value;
+  hideAsk();
+  shownAsk = answeredAsk = 0;  // 質問の番号は実行ごとに1から
+  let start;
+  try {
+    start = await (await fetch("/api/start", { method: "POST", body: JSON.stringify({ source: source.value }) })).json();
+  } catch {
+    start = { id: null, tokens: [], tree: null, readings: [], error: { kind: "network", message: "", line: null } };
+  }
+  if (id !== runId) return;
+  renderRows($("#readings"), start.marked_readings || start.readings, lines, (r) => makeReading(r),
+    "（書き方のエラーを直すと表示されます）");
+  if ((start.marked_readings || []).length) {
+    $("#readings").prepend(el("p", "note", "黄色の言葉や、点線の付いたまとまりにマウスを乗せると、実行したときの中身（途中の値）が見えます。クリックすると中身に差し替わり、もう一度クリックすると戻ります。"));
+  }
+  renderRows($("#expanded"), start.expanded || [], lines, (r) => el("pre", "out expanded", r.text),
+    "（書き方のエラーを直すと表示されます）");
+  if ((start.expanded || []).length) {
+    $("#expanded").prepend(el("p", "note", "主語の省略を（）で書き出した AZAORI です。「とは」の中の主語は これ と書きます。展開したものも、そのまま動きます。"));
+  }
+  renderTokens(start.tokens);
+  renderTree(start.tree);
+  renderAnalysis(start.analysis || []);
+  traceValues = new Map();
+  $("#results-list").replaceChildren();
+  $("#error-box").hidden = true;
+  errorLine = start.error && start.error.line;
+  if (runSource === source.value && start.elisions) setGhosts(start.elisions, runSource);
+  setErrorSpan(start.error);
+  updateGutter();
+  if (!start.id) {  // 書き方のエラー
+    $("#results-list").append(el("p", "empty", "（書き方のエラーを直すと実行します）"));
+    finish(start.error, started);
+    return;
+  }
+  currentRun = start.id;
+  setRunning(true);
+  let since = 0;
+  while (id === runId) {
+    let poll;
+    try {
+      poll = await (await fetch(`/api/poll?id=${start.id}&since=${since}`)).json();
+    } catch {
+      finish({ kind: "network", message: "", line: null }, started);
+      return;
+    }
+    if (id !== runId) return;
+    for (const ev of poll.events) appendEvent(ev, lines);
+    since += poll.events.length;
+    if (poll.status === "waiting") {
+      // 答えたあとに遅れて届いた、前の質問の知らせは無視する
+      if (poll.ask > answeredAsk) showAsk(poll.prompt, poll.mode, poll.options, poll.ask);
+    } else hideAsk();
+    if (["done", "error", "stopped", "gone"].includes(poll.status)) {
+      if (!since) $("#results-list").append(el("p", "empty",
+        poll.error ? "（エラーの前までの結果です）" : "（表示する結果はありません）"));
+      if (poll.note) $("#results-list").append(el("p", "empty", poll.note));
+      setTraceValues(poll.trace);
+      renderVars(poll.variables);
+      markReadingError(poll.error);
+      errorLine = poll.error && poll.error.line;
+      setErrorSpan(poll.error);
+      updateGutter();
+      finish(poll.error, started, poll.status === "stopped");
+      return;
+    }
+  }
+}
+
+// ---- 書き下しの中身: 黄色の言葉にマウスを乗せると中身、クリックで差し替え ----
+let traceValues = new Map();  // "行|鍵" → {values, uses}（鍵は 【点数】・これ・それ・あれ・ここ・#列）
+let readingError = null;      // 書き下しで印を付けたエラー
+
+// 目印（\uE000 鍵 \uE001 字 \uE002）は入れ子になるので、1字ずつ読んで組み立てる
+function makeReading(r) {
+  const box = el("div", "reading");
+  const stack = [box];
+  let text = "";
+  const flush = () => { if (text) { stack[stack.length - 1].append(text); text = ""; } };
+  for (let i = 0; i < r.text.length; i++) {
+    const ch = r.text[i];
+    if (ch === "\uE000") {
+      flush();
+      const close = r.text.indexOf("\uE001", i);
+      const key = r.text.slice(i + 1, close);
+      const span = el("span", key.startsWith("#") ? "rv step" : "rv");
+      span.dataset.key = key;
+      span.dataset.line = r.line;
+      stack[stack.length - 1].append(span);
+      stack.push(span);
+      i = close;
+    } else if (ch === "\uE002") {
+      flush();
+      if (stack.length > 1) stack.pop();
+    } else {
+      text += ch;
+    }
+  }
+  flush();
+  return box;
+}
+
+function setTraceValues(trace) {
+  traceValues = new Map();
+  for (const v of (trace && trace.values) || []) traceValues.set(`${v.line}|${v.key}`, v);
+}
+
+function markReadingError(error) {
+  readingError = null;
+  if (!error || !error.line) return;
+  const spans = [...document.querySelectorAll(`#readings .rv.step[data-line="${error.line}"]`)];
+  const span = spans.find((x) => x.dataset.key === `#${error.col}`);
+  if (span) {
+    span.classList.add("err");
+    readingError = error;
+  }
+  $("#readings").prepend(el("p", "note", span
+    ? `${error.line}行の赤い波線のまとまりでエラーになりました。その中の言葉にマウスを乗せると、エラーの直前の中身が見えます。`
+    : `${error.line}行でエラーになりました。黄色の言葉にマウスを乗せると、エラーまでの中身が見えます。`));
+}
+
+function valueOf(span) {
+  return traceValues.get(`${span.dataset.line}|${span.dataset.key}`);
+}
+
+function valueText(v) {
+  return v.values.join(" → ");
+}
+
+const tip = el("div");
+tip.id = "value-tip";
+tip.hidden = true;
+document.body.append(tip);
+let hot = null;
+
+function keyLabel(key) {
+  return key.startsWith("#") ? "途中の値" : key;
+}
+
+$("#readings").addEventListener("mouseover", (e) => {
+  const span = e.target.closest(".rv");
+  if (hot && hot !== span) hot.classList.remove("hot");
+  if (!span) { tip.hidden = true; return; }
+  hot = span;
+  span.classList.add("hot");
+  const v = valueOf(span);
+  tip.replaceChildren(el("span", "k", keyLabel(span.dataset.key)));
+  if (span.classList.contains("err") && readingError) {
+    tip.append(el("span", "e", `ここでエラー: ${readingError.message}`));
+  } else if (!v) {
+    tip.append(el("span", "m", currentRun ? "（実行中…）" : "（この行では、まだ使われていません。実行すると分かります）"));
+  } else {
+    tip.append(el("span", "v", valueText(v)));
+    if (v.values.length > 1) tip.append(el("div", "m", "左から、使われた順の中身です"));
+    if (v.uses > v.values.length) tip.append(el("div", "m", `この行で ${v.uses} 回使われました（最初の${v.values.length}つの中身）`));
+  }
+  const rect = span.getBoundingClientRect();
+  tip.hidden = false;
+  const top = rect.bottom + 6;
+  tip.style.left = `${Math.max(16, Math.min(rect.left, window.innerWidth - tip.offsetWidth - 16))}px`;
+  tip.style.top = `${top + tip.offsetHeight > window.innerHeight ? rect.top - tip.offsetHeight - 6 : top}px`;
+});
+$("#readings").addEventListener("mouseleave", () => {
+  tip.hidden = true;
+  if (hot) hot.classList.remove("hot");
+  hot = null;
+});
+$("#readings").addEventListener("click", (e) => {
+  const span = e.target.closest(".rv");
+  if (!span) return;
+  e.stopPropagation();
+  if (span.classList.contains("shown")) {  // 元の読みに戻す
+    span.replaceChildren(...span._original);
+    span.classList.remove("shown");
+    return;
+  }
+  const v = valueOf(span);
+  if (!v) return;
+  span._original = [...span.childNodes];
+  span.replaceChildren(valueText(v));
+  span.classList.add("shown");
+});
+
+function appendEvent(ev, lines) {
+  const list = $("#results-list");
+  const row = el("div", ev.kind === "結果" ? "row" : `row ev-${ev.kind}`);
+  const src = el("div", "src");
+  if (EVENT_BADGE[ev.kind]) src.append(el("span", `badge b-${ev.kind}`, EVENT_BADGE[ev.kind]), " ");
+  src.append((lines[ev.line - 1] || "").trim());
+  row.append(el("span", "ln", `${ev.line}行`), src, el("pre", "out", ev.text));
+  list.append(row);
+  row.scrollIntoView({ block: "nearest" });
+}
+
+function setRunning(running) {
+  $("#stop").hidden = !running;
+  if (running) {
+    statusBar.className = "";
+    statusBar.textContent = "実行中…";
+  }
+}
+
+function finish(error, started, stopped = false) {
+  setRunning(false);
+  hideAsk();
+  currentRun = null;
+  if (stopped) {
+    statusBar.className = "";
+    statusBar.textContent = "■ 止めました";
+    return;
+  }
+  renderStatus(error, performance.now() - started);
+}
+
+// ---- 待・認: 入力欄 ----
+let shownAsk = 0;     // 画面に出している質問の番号
+let answeredAsk = 0;  // 最後に答えた質問の番号
+
+function showAsk(prompt, mode, options, askId) {
+  const form = $("#ask");
+  if (!form.hidden && shownAsk === askId) return;  // 同じ質問なら出し直さない（別の質問なら入れ替える）
+  shownAsk = askId;
+  const yesno = mode === "yesno", choice = mode === "choice";
+  $("#ask-prompt").textContent = prompt || "入力してください";
+  $("#ask-badge").textContent = yesno ? "認" : choice ? "どれ" : "待";
+  $("#ask-text").hidden = yesno || choice;
+  $("#ask-yesno").hidden = !yesno;
+  const box = $("#ask-choice");
+  box.hidden = !choice;
+  box.replaceChildren();
+  if (choice) {
+    (options || []).forEach((option, i) => {
+      const btn = el("button", i === 0 ? "primary" : "", option);
+      btn.type = "button";
+      btn.dataset.answer = String(i);
+      box.append(btn);
+    });
+  }
+  form.hidden = false;
+  statusBar.className = "";
+  statusBar.textContent = yesno ? "「はい」か「いいえ」を選んでください…"
+    : choice ? "選択肢から1つ選んでください…" : "入力を待っています…";
+  showView("results");
+  (yesno ? $("#ask-yesno button") : choice ? (box.querySelector("button") || $("#ask-input")) : $("#ask-input")).focus();
+}
+
+function hideAsk() {
+  $("#ask").hidden = true;
+  $("#ask-input").value = "";
+}
+
+async function sendAnswer(text) {
+  if (!currentRun) return;
+  const ask = shownAsk;
+  answeredAsk = Math.max(answeredAsk, ask);
+  hideAsk();
+  statusBar.textContent = "実行中…";
+  await fetch("/api/answer", { method: "POST", body: JSON.stringify({ id: currentRun, text, ask }) });
+}
+
+$("#ask").addEventListener("submit", (e) => {
+  e.preventDefault();
+  sendAnswer($("#ask-input").value);
+});
+for (const id of ["#ask-yesno", "#ask-choice"]) {
+  $(id).addEventListener("click", (e) => {
+    const answer = e.target.closest("button")?.dataset.answer;
+    if (answer) sendAnswer(answer);
+  });
+}
+
+$("#stop").addEventListener("click", () => {
+  ++runId;
+  fetch("/api/stop", { method: "POST", body: JSON.stringify({ id: currentRun }) });
+  finish(null, performance.now(), true);
+});
+
+function renderRows(box, rows, lines, makeBody, emptyText) {
+  box.replaceChildren();
+  if (!rows.length) { box.append(el("p", "empty", emptyText)); return; }
+  for (const r of rows) {
+    const row = el("div", "row");
+    row.append(el("span", "ln", `${r.line}行`), el("div", "src", (lines[r.line - 1] || "").trim()), makeBody(r));
+    box.append(row);
+  }
+}
+
+function renderTokens(tokens) {
+  const box = $("#tokens");
+  box.replaceChildren();
+  const byLine = new Map();
+  for (const t of tokens) {
+    if (t.kind === "NEWLINE" || t.kind === "EOF") continue;
+    if (!byLine.has(t.line)) byLine.set(t.line, []);
+    byLine.get(t.line).push(t);
+  }
+  if (!byLine.size) { box.append(el("p", "empty", "（トークンがありません）")); return; }
+  for (const [line, list] of byLine) {
+    const row = el("div", "tok-line");
+    row.append(el("span", "ln", String(line)));
+    const chips = el("div", "chips");
+    for (const t of list) {
+      const chip = el("span", `chip k-${t.kind}`);
+      const text = t.kind === "STR" ? `「${t.value}」` : t.kind === "NAME" ? `【${t.value}】`
+        : t.kind === "EXT" ? `"${t.value}"` : String(t.value);
+      chip.append(el("b", "", text), el("small", "", KIND_LABEL[t.kind] || t.kind));
+      chips.append(chip);
+    }
+    row.append(chips);
+    box.append(row);
+  }
+}
+
+function renderAnalysis(rows) {
+  const box = $("#analysis");
+  box.replaceChildren();
+  if (!rows.length) { box.append(el("p", "empty", "（解析できる文がありません）")); return; }
+  const table = el("table");
+  const head = el("tr");
+  for (const label of ["行", "文", "型", "形", "効果"]) head.append(el("th", "", label));
+  const thead = el("thead");
+  thead.append(head);
+  table.append(thead);
+  const body = el("tbody");
+  for (const fact of rows) {
+    const row = el("tr");
+    row.append(
+      el("td", "", `${fact.line}行`),
+      el("td", "", fact.statement),
+      el("td", "", (fact.types || []).join("・") || "不明"),
+      el("td", "", fact.shape || "不明"),
+      el("td", "effects", (fact.effects || []).join("、") || "なし")
+    );
+    body.append(row);
+  }
+  table.append(body);
+  box.append(table);
+}
+
+function isNode(v) { return v && typeof v === "object" && !Array.isArray(v) && "type" in v; }
+
+function nodeView(node, label) {
+  const attrs = [], children = [];
+  for (const [key, value] of Object.entries(node.fields)) {
+    if (key === "line" || key === "col" || key === "end") continue;
+    if (isNode(value) || Array.isArray(value) && value.some(isNode)) children.push([key, value]);
+    else if (value !== null) attrs.push([key, value]);
+  }
+  const head = document.createDocumentFragment();
+  if (label) head.append(el("span", "fl", `${label}: `));
+  head.append(el("span", "ty", node.type));
+  for (const [key, value] of attrs) {
+    head.append(" ", el("span", "at", `${FIELD_LABEL[key] || key}=${JSON.stringify(value)}`));
+  }
+  if (!children.length) { const leaf = el("div", "leaf"); leaf.append(head); return leaf; }
+  const d = el("details");
+  d.open = true;
+  const summary = el("summary");
+  summary.append(head);
+  d.append(summary);
+  for (const [key, value] of children) {
+    const name = FIELD_LABEL[key] || key;
+    if (Array.isArray(value)) {
+      let list = d;
+      if (node.type !== "Program") {
+        d.append(el("div", "field", `${name}:`));
+        list = el("div", "field-list");
+        d.append(list);
+      }
+      for (const child of value) list.append(nodeView(child));
+    } else {
+      d.append(nodeView(value, name));
+    }
+  }
+  return d;
+}
+
+function renderTree(tree) {
+  $("#tree").replaceChildren(tree ? nodeView(tree) : el("p", "empty", "（構文木を作れませんでした）"));
+}
+
+function renderStatus(error, ms) {
+  const box = $("#error-box");
+  if (!error) {
+    statusBar.className = "ok";
+    statusBar.textContent = `✓ 実行完了（${ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(1)} 秒`}）`;
+    box.hidden = true;
+    return;
+  }
+  statusBar.className = "err";
+  statusBar.textContent = "✕ エラー";
+  const label = ERROR_LABEL[error.kind] || "エラー";
+  box.replaceChildren();
+  if (error.kind === "language" || error.kind === "wasm") {
+    box.append(el("strong", "", label), el("pre", "", error.message));
+  } else {
+    const where = error.line ? `${error.line}行目: ` : "";
+    box.append(el("strong", "", `${label}: `), where + error.message);
+  }
+  box.hidden = false;
+}
+
+// ---- 変数の状態: 名前を付けた値の、今の中身 ----
+function renderVars(vars) {
+  const box = $("#vars");
+  box.replaceChildren();
+  if (!vars || !vars.length) {
+    box.append(el("p", "empty", "（【名前】は … で名前を付けた値が、ここに並びます）"));
+    return;
+  }
+  const table = el("table", "vars");
+  const head = el("tr");
+  for (const h of ["名前", "値", "形"]) head.append(el("th", "", h));
+  table.append(head);
+  for (const [name, value, shape] of vars) {
+    const tr = el("tr");
+    tr.append(el("td", "name", name), el("td", "value", value), el("td", "shape", shape));
+    table.append(tr);
+  }
+  box.append(table);
+}
+
+$("#copy").addEventListener("click", async () => {
+  const text = [...document.querySelectorAll("#results-list .out")].map((x) => x.textContent).join("\n");
+  try {
+    await navigator.clipboard.writeText(text);
+    $("#copy").textContent = "✓ コピーしました";
+  } catch {
+    $("#copy").textContent = "コピーできません";
+  }
+  setTimeout(() => ($("#copy").textContent = "⧉ コピー"), 1500);
+});
+
+function onEdit() {
+  try { localStorage.setItem(DRAFT_KEY, source.value); } catch {}
+  $("#file-dirty").hidden = false;
+  updateCurLine();
+  errorSpan = null;  // 書き換えたら、前のエラーの場所は消す
+  renderHighlight();
+  updateGutter();
+  scheduleAnalyze();
+  if (!$("#auto").checked) return;
+  clearTimeout(timer);
+  // 「待」があると書くたびに質問が出てしまうので、実行ボタンで動かす
+  if (/[待認]|どれ/.test(source.value.replace(/「[^」]*」|『[^』]*』|【[^】]*】|※.*/g, ""))) {
+    statusBar.className = "";
+    statusBar.textContent = "「待」「認」「どれ」を含むプログラムは、実行ボタン（Ctrl+Enter）で動かします";
+    return;
+  }
+  timer = setTimeout(run, 350);
+}
+
+source.addEventListener("input", onEdit);
+source.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    run();
+  } else if (e.key === "Enter" && !e.isComposing && !e.shiftKey) {
+    // 説 の中身を書くとき: 字下げを続ける（「説」で終わる行のあとは字下げを始め、「。」で閉じた行のあとは字下げをやめる）
+    const pos = source.selectionStart;
+    const line = source.value.slice(source.value.lastIndexOf("\n", pos - 1) + 1, pos);
+    const code = line.replace(/※.*$/, "").trimEnd();
+    const indent = /[。｡]$/.test(code) ? "" : (line.match(/^[ 　]*/)[0] || (/説$/.test(code) ? "  " : ""));
+    if (indent) {
+      e.preventDefault();
+      source.setRangeText("\n" + indent, pos, source.selectionEnd, "end");
+      onEdit();
+    }
+  } else if (e.key === "Tab" && !e.isComposing) {
+    e.preventDefault();
+    if (!completeWord()) {
+      source.setRangeText("  ", source.selectionStart, source.selectionEnd, "end");
+      onEdit();
+    }
+  } else if (!["Shift", "Control", "Alt", "Meta"].includes(e.key)) {
+    completion = null;  // Tab 以外を押したら、候補の切り替えは終わり
+  }
+});
+
+// ---- 入力の手助け: ローマ字・かな + Tab で漢字にする ----
+let keymap = [];          // {key, kanji, desc} ローマ字・かなの読み → 字
+let completion = null;    // Tab で候補を切り替えている途中なら {start, list, idx}
+const MODIFIER_SET = new Set();
+const DEFAULT_HINT = "ローマ字かかなで打って Tab で漢字に（例: tasu・たす → 足、sou・そう → 総）。[[ で【】";
+// AZAORI の言葉として書くかな（Tab で漢字にしない）
+const KANA_WORDS = new Set(["これ", "それ", "あれ", "ここ", "どれ", "とは", "は"]);
+
+function readingAtEnd(text) {
+  // 【名前】や「文字」の中なら変換しない
+  const open = Math.max(text.lastIndexOf("【"), text.lastIndexOf("「"), text.lastIndexOf("『"));
+  const close = Math.max(text.lastIndexOf("】"), text.lastIndexOf("」"), text.lastIndexOf("』"));
+  if (open > close) return null;
+  const m = text.match(/[A-Za-z]+$/) || text.match(/[ぁ-ゖー]+$/);
+  if (!m || KANA_WORDS.has(m[0])) return null;
+  return m[0].toLowerCase();
+}
+
+function wordBeforeCursor() {
+  const pos = source.selectionStart;
+  if (pos !== source.selectionEnd) return null;
+  const word = readingAtEnd(source.value.slice(0, pos));
+  return word ? { word, start: pos - word.length, end: pos } : null;
+}
+
+function candidates(word) {
+  const exact = keymap.filter((k) => k.key === word);
+  const prefix = keymap.filter((k) => k.key !== word && k.key.startsWith(word));
+  const seen = new Set();
+  return [...exact, ...prefix].filter((k) => !seen.has(k.kanji) && seen.add(k.kanji)).slice(0, 8);
+}
+
+function completeWord() {
+  if (completion) {  // もう一度 Tab: 次の候補に切り替える
+    const { start, list } = completion;
+    const current = list[completion.idx].kanji;
+    if (source.value.slice(start, start + current.length) === current && list.length > 1) {
+      completion.idx = (completion.idx + 1) % list.length;
+      source.setRangeText(list[completion.idx].kanji, start, start + current.length, "end");
+      onEdit();
+      renderHint(list, completion.idx);
+      return true;
+    }
+    completion = null;
+  }
+  const w = wordBeforeCursor();
+  if (!w) return false;
+  const list = candidates(w.word);
+  if (!list.length) return false;
+  source.setRangeText(list[0].kanji, w.start, w.end, "end");
+  completion = { start: w.start, list, idx: 0 };
+  onEdit();
+  renderHint(list, 0);
+  return true;
+}
+
+function renderHint(list, current, label) {
+  const hint = $("#hint");
+  hint.replaceChildren();
+  if (!list) { hint.textContent = DEFAULT_HINT; return; }
+  hint.append(label || (current === undefined ? "Tab →" : "Tab で次の候補 →"));
+  list.forEach((k, i) => {
+    const c = el("span", i === (current ?? 0) ? "cand first" : "cand");
+    c.append(el("b", "", k.kanji), el("small", "", k.desc));
+    hint.append(c);
+  });
+}
+
+function updateHint() {
+  if (completion) {
+    // カーソルが確定した字の直後から動いていたら（続けて入力したなど）、候補の切り替えは終わり
+    const end = completion.start + completion.list[completion.idx].kanji.length;
+    if (source.selectionStart === end && source.selectionEnd === end) return;
+    completion = null;
+  }
+  const w = wordBeforeCursor();
+  const list = w ? candidates(w.word) : [];
+  renderHint(list.length ? list : null);
+}
+
+source.addEventListener("input", () => {
+  // [[ で【】（カーソルは中へ）
+  const pos = source.selectionStart;
+  if (source.value.slice(pos - 2, pos) === "[[") {
+    source.setRangeText("【】", pos - 2, pos, "start");
+    source.selectionStart = source.selectionEnd = pos - 1;
+    onEdit();
+  }
+  updateHint();
+});
+source.addEventListener("click", updateHint);
+// 日本語入力で打っている途中（確定前）も候補を見せる。選ぶのは確定してからの Tab
+source.addEventListener("compositionupdate", (e) => {
+  const text = (e.data || "").replace(/[A-Za-z]+$/, (m) => (/[ぁ-ゖー]/.test(e.data) ? "" : m));
+  const word = text ? readingAtEnd(source.value.slice(0, source.selectionStart - (e.data || "").length) + text) : null;
+  const list = word ? candidates(word) : [];
+  renderHint(list.length ? list : null, undefined, "確定してから Tab →");
+});
+source.addEventListener("keyup", (e) => { if (e.key.startsWith("Arrow")) updateHint(); });
+
+// ---- 入力の手助け: 漢字パレット ----
+function insertAtCursor(text, caretOffset) {
+  const s = source.selectionStart, e = source.selectionEnd;
+  source.setRangeText(text, s, e, "end");
+  if (caretOffset !== undefined) source.selectionStart = source.selectionEnd = s + caretOffset;
+  source.focus();
+  onEdit();
+  updateHint();
+}
+
+function insertKanji(item) {
+  const s = source.selectionStart;
+  const prev = source.value[s - 1];
+  // 前に区切りが要るか（行の最初・スペース・括弧の直後・熟語の前の字の直後なら要らない）
+  const lead = s > 0 && prev !== undefined && !/[\s(（【「]/.test(prev) && !MODIFIER_SET.has(prev) ? " " : "";
+  // 熟語の前の字（総・累 など）のあとはスペースを入れない（続けて押すと熟語になる）
+  insertAtCursor(lead + item.kanji + (item.modifier ? "" : " "));
+}
+
+function insertBracket(b) {
+  const s = source.selectionStart, e = source.selectionEnd;
+  const inner = source.value.slice(s, e);
+  insertAtCursor(b.open + inner + b.close, b.open.length + inner.length);
+}
+
+let paletteData = { groups: [], brackets: [] };
+let paletteTab = "基本";
+
+async function loadPalette() {
+  try { paletteData = await (await fetch("/api/palette")).json(); } catch {}
+  keymap = [];
+  for (const g of paletteData.groups) {
+    for (const item of g.items) {
+      if (item.modifier) MODIFIER_SET.add(item.kanji);
+      for (const key of [...item.keys, ...(item.kana || [])]) keymap.push({ key, kanji: item.kanji, desc: item.desc });
+    }
+  }
+  const tabs = $("#palette-tabs");
+  tabs.replaceChildren();
+  for (const name of [...new Set(paletteData.groups.map((g) => g.tab))]) {
+    const b = el("button", "ptab", name);
+    b.addEventListener("click", () => { paletteTab = name; $("#palette-search").value = ""; renderPalette(); });
+    tabs.append(b);
+  }
+  try { paletteTab = localStorage.getItem("azaori-palette-tab") || paletteTab; } catch {}
+  renderPalette();
+  renderHint(null);
+}
+
+function paletteKey(item) {
+  const cls = item.modifier ? "pkey mod" : /^[+\-×÷^]$/.test(item.kanji) ? "pkey sym" : /^[ぁ-ゖ]+$/.test(item.kanji) ? "pkey word" : "pkey";
+  const btn = el("button", cls);
+  btn.append(el("b", "", item.kanji), el("small", "", item.short || ""));
+  btn.title = `${item.kanji}（${[...item.keys, ...(item.kana || [])].join("・")}）: ${item.desc}`;
+  btn.addEventListener("mousedown", (e) => e.preventDefault());  // 入力欄のカーソルを保つ
+  btn.addEventListener("click", () => (item.kanji === "（" ? insertBracket({ open: "（", close: "）" }) : insertKanji(item)));
+  return btn;
+}
+
+function paletteGroup(name, keys) {
+  const g = el("div", "pgroup");
+  g.append(el("div", "pgroup-name", name));
+  const box = el("div", "pkeys");
+  box.append(...keys);
+  g.append(box);
+  return g;
+}
+
+function renderPalette() {
+  const box = $("#palette");
+  box.replaceChildren();
+  const query = $("#palette-search").value.trim().toLowerCase();
+  document.querySelectorAll(".ptab").forEach((b) => b.classList.toggle("active", !query && b.textContent === paletteTab));
+  try { localStorage.setItem("azaori-palette-tab", paletteTab); } catch {}
+  if (query) {  // 字・読み（ローマ字・かな）・意味・説明で探す
+    const seen = new Set(), hits = [];
+    for (const g of paletteData.groups) {
+      for (const item of g.items) {
+        const words = [item.kanji, item.short || "", item.desc, ...item.keys, ...(item.kana || [])].join(" ").toLowerCase();
+        if (!seen.has(item.kanji) && words.includes(query)) { seen.add(item.kanji); hits.push(item); }
+      }
+    }
+    box.append(hits.length ? paletteGroup(`「${query}」で見つかった字`, hits.map(paletteKey)) : el("p", "empty", "見つかりませんでした"));
+    return;
+  }
+  for (const g of paletteData.groups.filter((x) => x.tab === paletteTab)) box.append(paletteGroup(g.name, g.items.map(paletteKey)));
+  if (paletteTab === "基本") {
+    box.append(paletteGroup("括弧（選んだ文字を囲むこともできます）", paletteData.brackets.map((b) => {
+      const btn = el("button", "pkey sym");
+      btn.append(el("b", "", `${b.open}${b.close}`), el("small", "", b.desc));
+      btn.addEventListener("mousedown", (e) => e.preventDefault());
+      btn.addEventListener("click", () => insertBracket(b));
+      return btn;
+    })));
+  }
+}
+$("#palette-search").addEventListener("input", renderPalette);
+
+// ---- 設定: スペースの色・パレットの表示 ----
+$("#settings").addEventListener("click", (e) => {
+  e.stopPropagation();
+  $("#settings-menu").hidden = !$("#settings-menu").hidden;
+});
+function applySettings() {
+  document.body.classList.toggle("no-space", !$("#show-space").checked);
+  document.body.classList.toggle("no-palette", !$("#show-palette").checked);
+  document.body.classList.toggle("no-ghost", !$("#show-ghost").checked);
+  try { localStorage.setItem("azaori-settings", JSON.stringify({ space: $("#show-space").checked, palette: $("#show-palette").checked, ghost: $("#show-ghost").checked })); } catch {}
+}
+try {
+  const saved = JSON.parse(localStorage.getItem("azaori-settings") || "{}");
+  if (saved.space === false) $("#show-space").checked = false;
+  if (saved.palette === false) $("#show-palette").checked = false;
+  if (saved.ghost === false) $("#show-ghost").checked = false;
+} catch {}
+$("#show-ghost").addEventListener("change", applySettings);
+$("#show-space").addEventListener("change", applySettings);
+$("#show-palette").addEventListener("change", applySettings);
+applySettings();
+
+$("#run").addEventListener("click", run);
+
+// ---- サンプル・保存・文法メモ ----
+async function loadSamples() {
+  try { samples = await (await fetch("/api/samples")).json(); } catch { samples = []; }
+  const select = $("#samples");
+  const first = el("option", "", "📄 標本（サンプル）");
+  first.value = "";
+  select.replaceChildren(first);
+  for (const s of samples) {
+    const opt = el("option", "", s.name);
+    opt.value = s.name;
+    select.append(opt);
+  }
+}
+$("#samples").addEventListener("change", (e) => {
+  const s = samples.find((x) => x.name === e.target.value);
+  e.target.value = "";
+  if (!s) return;
+  source.value = s.source;
+  onEdit();
+  setFileName(s.name);
+  run();
+});
+$("#save").addEventListener("click", async () => {
+  const name = prompt("このブラウザに保存します。ファイル名（.azo は不要）:");
+  if (!name) return;
+  if (samples.some((s) => s.name === name) && !confirm(`「${name}」は既にあります。上書きしますか？`)) return;
+  const r = await (await fetch("/api/save", { method: "POST", body: JSON.stringify({ name, source: source.value }) })).json();
+  if (!r.ok) { alert(r.message); return; }
+  await loadSamples();
+  setFileName(name);
+  statusBar.className = "ok";
+  statusBar.textContent = `✓ ${name}.azo をブラウザに保存しました`;
+});
+
+function setFileName(name) {
+  $("#file-name").textContent = `${name}.azo`;
+  $("#file-dirty").hidden = true;
+  try { localStorage.setItem("azaori-file-name", name); } catch {}
+}
+
+async function loadReference() {
+  let data = null;
+  try { data = await (await fetch("/api/reference")).json(); } catch {}
+  const box = $("#reference-body");
+  if (!data) { box.replaceChildren(el("p", "empty", "（リファレンスを読み込めませんでした）")); return; }
+  const frag = document.createDocumentFragment();
+  const codeCell = (code) => {
+    const c = el("code", "ref-code", code.replaceAll("\n", " ／ "));
+    c.title = "クリックでエディタに入れる";
+    c.addEventListener("click", () => {
+      const sep = source.value && !source.value.endsWith("\n") ? "\n" : "";
+      source.value += sep + code + "\n";
+      onEdit();
+      source.focus();
+    });
+    return c;
+  };
+  const resultText = (r) => r === null ? "（入力や時刻による）" : r.replaceAll("\n", " ／ ");
+
+  frag.append(el("h3", "", "基本の20字"),
+    el("p", "", "まずはこの20字だけで、合計・平均・絞り込み・並べ替え・文字の分割と結合・条件分岐・くりかえしが書けます。"),
+    el("p", "basic-list", data.basic.join("　")));
+
+  frag.append(el("h3", "", "規則"));
+  for (const rule of data.rules) {
+    frag.append(el("h4", "", rule.title), el("p", "", rule.text));
+    if (!rule.examples.length) continue;
+    const table = el("table");
+    const head = el("tr");
+    head.append(el("th", "", "書き方"), el("th", "", "結果"));
+    table.append(head);
+    for (const ex of rule.examples) {
+      const tr = el("tr");
+      const td = el("td");
+      td.append(codeCell(ex.code));
+      tr.append(td, el("td", "mono", resultText(ex.result)));
+      table.append(tr);
+    }
+    frag.append(table);
+  }
+  frag.append(el("h4", "", "覚えておきたい例外"));
+  const ul = el("ul");
+  for (const x of data.exceptions) ul.append(el("li", "", x));
+  frag.append(ul);
+
+  frag.append(el("h3", "", "字の一覧"), el("p", "", "★ は基本の20字。例の中の名前は、次のように用意してあります。"),
+    el("pre", "", data.prelude));
+  for (const group of data.groups) {
+    frag.append(el("h4", "", group.name));
+    const table = el("table");
+    const head = el("tr");
+    for (const h of ["字", "使い方", "意味", "例", "結果"]) head.append(el("th", "", h));
+    table.append(head);
+    for (const item of group.items) {
+      const tr = el("tr");
+      const use = item.monad === null ? "" : [item.monad && "値1つ", item.dyad && "値2つ"].filter(Boolean).join("・");
+      const ex = el("td");
+      ex.append(codeCell(item.code));
+      tr.append(el("td", "k", (item.basic ? "★" : "") + item.kanji), el("td", "", use), el("td", "", item.desc),
+        ex, el("td", "mono", resultText(item.result)));
+      table.append(tr);
+    }
+    frag.append(table);
+  }
+  frag.append(el("h3", "", "予約している字・名前が変わった字"));
+  const reserved = el("table");
+  for (const [k, v] of Object.entries(data.reserved)) {
+    const tr = el("tr");
+    tr.append(el("td", "k", k), el("td", "", v));
+    reserved.append(tr);
+  }
+  frag.append(reserved);
+  box.replaceChildren(frag);
+}
+
+(async () => {
+  loadReference();
+  loadPalette();
+  await loadSamples();
+  let draft = null;
+  try { draft = localStorage.getItem(DRAFT_KEY) || localStorage.getItem("aza-draft"); } catch {}  // 旧名のときの書きかけも読む
+  source.value = draft || (samples.find((s) => s.name.includes("分散")) || samples[0] || { source: "" }).source;
+  let fileName = null;
+  try { fileName = localStorage.getItem("azaori-file-name"); } catch {}
+  $("#file-name").textContent = `${fileName || "無題"}.azo`;
+  renderHighlight();
+  updateGutter();
+  run();
+})();
+</script>
+</body>
+</html>

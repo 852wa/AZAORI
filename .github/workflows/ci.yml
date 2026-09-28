@@ -1,0 +1,69 @@
+name: Verify and deploy
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
+      - run: npm run test:wasm-api
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack@0.15.0
+      - run: wasm-pack build --target web --out-dir playground/pkg --release --no-opt
+      - run: npm run build:web-data
+      - run: git diff --exit-code -- playground/data.json
+      - run: npx playwright install --with-deps chromium
+      - name: Browser verification
+        run: |
+          node tools/serve.mjs 8767 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8767/ > /dev/null && break; sleep 1; done
+          npm run test:web
+      # 検証を通ったプレイグラウンドを、そのまま配備に使う
+      - name: Prepare site
+        run: rm -f playground/pkg/.gitignore playground/pkg/package.json playground/pkg/README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: playground
+          if-no-files-found: error
+
+  deploy:
+    # main への push のときだけ、Cloudflare Pages へ送る（「ブラウザで試す」のページ）
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # 初回はプロジェクトを作る（すでにあれば何もしない）
+          preCommands: npx wrangler pages project create azaori --production-branch=main || true
+          command: pages deploy site --project-name=azaori --branch=main

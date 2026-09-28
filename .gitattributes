@@ -1,0 +1,8 @@
+# 改行は Git の中では LF にそろえる（Windows では取り出すときに CRLF になる）
+* text=auto
+
+# 生成・固定したデータ。差分表示や言語の統計から外す
+conformance/cases.json linguist-generated -diff
+conformance/superseded.json linguist-generated
+playground/data.json linguist-generated -diff
+*.wasm binary

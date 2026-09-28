@@ -1,0 +1,10 @@
+/target/
+/playground/pkg/
+/node_modules/
+/files/*
+!/files/加点後.txt
+!/files/控え.txt
+!/files/点数.txt
+__pycache__/
+# 手元で GitHub へ送るためのもの
+push.bat

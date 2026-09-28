@@ -1,0 +1,6 @@
+# 対話入力（待・認・どれ）に使う SharedArrayBuffer のため、ページを他のオリジンから切り離す
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

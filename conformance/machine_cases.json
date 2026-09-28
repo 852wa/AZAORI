@@ -1,0 +1,1510 @@
+{
+  "schema_version": 1,
+  "spec_version": "azaori-1",
+  "description": "Additional continuation, scope and unwinding regression cases with fixed expectations.",
+  "cases": [
+    {
+      "id": "afa2ff63fb5ff8d6",
+      "mode": "run",
+      "source": "【f】とは これ 以下 0 真 0 偽 （1 足 （これ 引 1 【f】））\n4999 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "4999"
+                }
+              ]
+            },
+            "text": "4999"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "4999"
+                }
+              ]
+            },
+            "text": "4999"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.non_tail_4999"
+      ]
+    },
+    {
+      "id": "a9a6fcafd7ed2431",
+      "mode": "run",
+      "source": "【f】とは これ 以下 0 真 0 偽 （1 足 （これ 引 1 【f】））\n5001 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [],
+        "events": [],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": {
+          "kind": "runtime",
+          "message": "呼び出しが深すぎます（自分自身を呼ぶ操作は5000段までです）",
+          "line": 2,
+          "col": 5,
+          "end": 8
+        }
+      },
+      "origin": [
+        "machine.non_tail_5001"
+      ]
+    },
+    {
+      "id": "9507468cda895aa5",
+      "mode": "run",
+      "source": "【f】とは これ 以下 0 真 0 偽 （1 足 （これ 引 1 【f】））\n5001 試【f】 7\n1 2 各（足 ここ）",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "7"
+                }
+              ]
+            },
+            "text": "7"
+          },
+          {
+            "line": 3,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "2"
+                },
+                {
+                  "type": "int",
+                  "value": "4"
+                }
+              ]
+            },
+            "text": "2 4"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "7"
+                }
+              ]
+            },
+            "text": "7"
+          },
+          {
+            "kind": "結果",
+            "line": 3,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "2"
+                },
+                {
+                  "type": "int",
+                  "value": "4"
+                }
+              ]
+            },
+            "text": "2 4"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.caught_depth_restores_positions"
+      ]
+    },
+    {
+      "id": "f5f96fddaec09b86",
+      "mode": "run",
+      "source": "【n】は 1000\n【和】とは 説\n  仮【n】は これ\n  仮【子】は 【n】 以下 0 真 0 偽 （【n】 引 1 【和】）\n  【子】 足 【n】。\n8 【和】\n【n】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 6,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "36"
+                }
+              ]
+            },
+            "text": "36"
+          },
+          {
+            "line": 7,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "1000"
+                }
+              ]
+            },
+            "text": "1000"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 6,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "36"
+                }
+              ]
+            },
+            "text": "36"
+          },
+          {
+            "kind": "結果",
+            "line": 7,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "1000"
+                }
+              ]
+            },
+            "text": "1000"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.recursive_block_locals"
+      ]
+    },
+    {
+      "id": "10f9942d97a99b2a",
+      "mode": "run",
+      "source": "【読む】とは これ 足 【保存】\n【計算】とは 説\n  仮【保存】は これ 自掛\n  1 【読む】。\n3 【計算】\n4 【計算】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [],
+        "events": [],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": {
+          "kind": "runtime",
+          "message": "【保存】はまだありません（【計算】の2行目）",
+          "line": 5,
+          "col": 2,
+          "end": 6
+        }
+      },
+      "origin": [
+        "machine.caller_locals_not_inherited"
+      ]
+    },
+    {
+      "id": "f2d0cfc3bd16b388",
+      "mode": "run",
+      "source": "【危険】とは 説\n  仮【x】は これ\n  これ 以下 0 真 （これ 割 0） 偽 （これ 引 1 【危険】）。\n【復旧】とは 説\n  仮【x】は これ 掛 10\n  仮【a】は これ 試【危険】 7\n  【a】 足 【x】 足 ここ。\n1 2 3 各【復旧】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 8,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "18"
+                },
+                {
+                  "type": "int",
+                  "value": "29"
+                },
+                {
+                  "type": "int",
+                  "value": "40"
+                }
+              ]
+            },
+            "text": "18 29 40"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 8,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "18"
+                },
+                {
+                  "type": "int",
+                  "value": "29"
+                },
+                {
+                  "type": "int",
+                  "value": "40"
+                }
+              ]
+            },
+            "text": "18 29 40"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.caught_recursive_scope"
+      ]
+    },
+    {
+      "id": "1ebbe9310f7111ea",
+      "mode": "run",
+      "source": "1 2 3 各（これ 各（足 （あれ 総足）） 足 （あれ 総足））",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 1,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "8"
+                },
+                {
+                  "type": "int",
+                  "value": "10"
+                },
+                {
+                  "type": "int",
+                  "value": "12"
+                }
+              ]
+            },
+            "text": "8 10 12"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 1,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "8"
+                },
+                {
+                  "type": "int",
+                  "value": "10"
+                },
+                {
+                  "type": "int",
+                  "value": "12"
+                }
+              ]
+            },
+            "text": "8 10 12"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.nested_are"
+      ]
+    },
+    {
+      "id": "9afca1d3115abb66",
+      "mode": "run",
+      "source": "10 20 各（これ 毎（足 それ 足 ここ） 7 総足 足 ここ）",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 1,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "19"
+                },
+                {
+                  "type": "int",
+                  "value": "30"
+                }
+              ]
+            },
+            "text": "19 30"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 1,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "19"
+                },
+                {
+                  "type": "int",
+                  "value": "30"
+                }
+              ]
+            },
+            "text": "19 30"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.nested_every_position"
+      ]
+    },
+    {
+      "id": "8e8a44b024defa39",
+      "mode": "run",
+      "source": "【f】とは これ 回 3 （足 ここ）\n10 20 各【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "13"
+                },
+                {
+                  "type": "int",
+                  "value": "26"
+                }
+              ]
+            },
+            "text": "13 26"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "13"
+                },
+                {
+                  "type": "int",
+                  "value": "26"
+                }
+              ]
+            },
+            "text": "13 26"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.loop_position"
+      ]
+    },
+    {
+      "id": "1748713c8338a65f",
+      "mode": "run",
+      "source": "【計算】とは 説\n  仮【一】は これ 各（足 それ） 10\n  【一】 足 それ。\n1 2 【計算】 100",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 4,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "111"
+                },
+                {
+                  "type": "int",
+                  "value": "112"
+                }
+              ]
+            },
+            "text": "111 112"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 4,
+            "value": {
+              "shape": [
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "111"
+                },
+                {
+                  "type": "int",
+                  "value": "112"
+                }
+              ]
+            },
+            "text": "111 112"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.sore_scope"
+      ]
+    },
+    {
+      "id": "e3476b09775bdaef",
+      "mode": "run",
+      "source": "【f】とは これ 足 10 超 10 真 （これ 足 1） 偽 （これ 引 1）\n2 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "3"
+                }
+              ]
+            },
+            "text": "3"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "3"
+                }
+              ]
+            },
+            "text": "3"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.branch_subject"
+      ]
+    },
+    {
+      "id": "eeab55e2ab8a02c9",
+      "mode": "run",
+      "source": "【止】とは これ 真 終 偽 99\n1 試【止】 123\n999",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [],
+        "events": [
+          {
+            "kind": "終",
+            "line": 2,
+            "value": {
+              "shape": [
+                14
+              ],
+              "kind": "text",
+              "data": [
+                {
+                  "type": "char",
+                  "value": "こ"
+                },
+                {
+                  "type": "char",
+                  "value": "こ"
+                },
+                {
+                  "type": "char",
+                  "value": "で"
+                },
+                {
+                  "type": "char",
+                  "value": "プ"
+                },
+                {
+                  "type": "char",
+                  "value": "ロ"
+                },
+                {
+                  "type": "char",
+                  "value": "グ"
+                },
+                {
+                  "type": "char",
+                  "value": "ラ"
+                },
+                {
+                  "type": "char",
+                  "value": "ム"
+                },
+                {
+                  "type": "char",
+                  "value": "を"
+                },
+                {
+                  "type": "char",
+                  "value": "終"
+                },
+                {
+                  "type": "char",
+                  "value": "え"
+                },
+                {
+                  "type": "char",
+                  "value": "ま"
+                },
+                {
+                  "type": "char",
+                  "value": "し"
+                },
+                {
+                  "type": "char",
+                  "value": "た"
+                }
+              ]
+            },
+            "text": "ここでプログラムを終えました"
+          }
+        ],
+        "requests": [],
+        "ended": true,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.attempt_propagates_end"
+      ]
+    },
+    {
+      "id": "7bc4288f5550b744",
+      "mode": "run",
+      "source": "【止】とは これ 真 終 偽 99\n1 0 試【止】 123\n999",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "123"
+                }
+              ]
+            },
+            "text": "123"
+          },
+          {
+            "line": 3,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "999"
+                }
+              ]
+            },
+            "text": "999"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "123"
+                }
+              ]
+            },
+            "text": "123"
+          },
+          {
+            "kind": "結果",
+            "line": 3,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "999"
+                }
+              ]
+            },
+            "text": "999"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.attempt_catches_array_end_error"
+      ]
+    },
+    {
+      "id": "8ad3d8ae65651662",
+      "mode": "run",
+      "source": "【内側】とは 説\n  仮【x】は これ 足 1\n  【x】 割 0。\n【外側】とは これ 【内側】\n10 【外側】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [],
+        "events": [],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": {
+          "kind": "runtime",
+          "message": "0で割ることはできません（【内側】の2行目）",
+          "line": 5,
+          "col": 3,
+          "end": 7
+        }
+      },
+      "origin": [
+        "machine.nested_block_error_span"
+      ]
+    },
+    {
+      "id": "4a703f7c1621a9e8",
+      "mode": "run",
+      "source": "【f】とは これ 置 0.01 引 1 【f】\n1 試【f】 7\n999",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": [],
+        "stop_after_sleeps": 3
+      },
+      "expected": {
+        "results": [],
+        "events": [],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0.03,
+        "error": {
+          "kind": "stopped",
+          "message": "実行を止めました",
+          "line": 2,
+          "col": null,
+          "end": null
+        }
+      },
+      "origin": [
+        "machine.attempt_does_not_catch_stop"
+      ]
+    },
+    {
+      "id": "b5c1fc845524ed09",
+      "mode": "run",
+      "source": "【f】とは これ 足 1 + （これ 試（割 0） 10） × 2\n3 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "24"
+                }
+              ]
+            },
+            "text": "24"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "24"
+                }
+              ]
+            },
+            "text": "24"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.math_acc_after_attempt"
+      ]
+    },
+    {
+      "id": "612103e98515aef0",
+      "mode": "run",
+      "source": "【f】とは これ + （これ 以下 0 真 0 偽 （これ 引 1 【f】））\n20 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "210"
+                }
+              ]
+            },
+            "text": "210"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "210"
+                }
+              ]
+            },
+            "text": "210"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.math_non_tail_recursion"
+      ]
+    },
+    {
+      "id": "acc874d4fe3d5fd6",
+      "mode": "run",
+      "source": "【f】とは これ 以下 0 真 0 偽 （これ 引 1 各【f】 総足 足 1）\n4999 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "4999"
+                }
+              ]
+            },
+            "text": "4999"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "4999"
+                }
+              ]
+            },
+            "text": "4999"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.deep_recursion_through_each"
+      ]
+    },
+    {
+      "id": "9441f1d2b8f62e58",
+      "mode": "run",
+      "source": "【f】とは これ 各（ここ）\n1 2 3 4 列 2 2 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [
+                2,
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "1"
+                      },
+                      {
+                        "type": "int",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "1"
+                      },
+                      {
+                        "type": "int",
+                        "value": "2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "2"
+                      },
+                      {
+                        "type": "int",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "2"
+                      },
+                      {
+                        "type": "int",
+                        "value": "2"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "text": "（1 1） （1 2）\n（2 1） （2 2）"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [
+                2,
+                2
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "1"
+                      },
+                      {
+                        "type": "int",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "1"
+                      },
+                      {
+                        "type": "int",
+                        "value": "2"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "2"
+                      },
+                      {
+                        "type": "int",
+                        "value": "1"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "array",
+                  "value": {
+                    "shape": [
+                      2
+                    ],
+                    "kind": "",
+                    "data": [
+                      {
+                        "type": "int",
+                        "value": "2"
+                      },
+                      {
+                        "type": "int",
+                        "value": "2"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "text": "（1 1） （1 2）\n（2 1） （2 2）"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.matrix_positions_in_body"
+      ]
+    },
+    {
+      "id": "863e9cb80fdfdef7",
+      "mode": "run",
+      "source": "【f】とは これ 前総足\n1 2 3 4 5 6 列 2 3 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "5"
+                },
+                {
+                  "type": "int",
+                  "value": "7"
+                },
+                {
+                  "type": "int",
+                  "value": "9"
+                }
+              ]
+            },
+            "text": "5 7 9"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [
+                3
+              ],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "5"
+                },
+                {
+                  "type": "int",
+                  "value": "7"
+                },
+                {
+                  "type": "int",
+                  "value": "9"
+                }
+              ]
+            },
+            "text": "5 7 9"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.axis_reduction_in_body"
+      ]
+    },
+    {
+      "id": "5b460efac7849dbe",
+      "mode": "run",
+      "source": "【f】とは これ 内足掛 （4 5 6）\n1 2 3 【f】",
+      "host": {
+        "inputs": [],
+        "files": {},
+        "outside": {},
+        "random_values": [],
+        "random_deals": [],
+        "random_shuffles": [],
+        "seed": 12345,
+        "available_inputs": []
+      },
+      "expected": {
+        "results": [
+          {
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "32"
+                }
+              ]
+            },
+            "text": "32"
+          }
+        ],
+        "events": [
+          {
+            "kind": "結果",
+            "line": 2,
+            "value": {
+              "shape": [],
+              "kind": "",
+              "data": [
+                {
+                  "type": "int",
+                  "value": "32"
+                }
+              ]
+            },
+            "text": "32"
+          }
+        ],
+        "requests": [],
+        "ended": false,
+        "files": {},
+        "slept": 0,
+        "error": null
+      },
+      "origin": [
+        "machine.inner_product_in_body"
+      ]
+    }
+  ]
+}

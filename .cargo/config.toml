@@ -1,0 +1,6 @@
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "link-arg=-zstack-size=67108864"]
+
+# テストのスレッドも CLI・WASM と同じ 64MB のスタックで動かす（深い式の上限を確かめるため）
+[env]
+RUST_MIN_STACK = "67108864"

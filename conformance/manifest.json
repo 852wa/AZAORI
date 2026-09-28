@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "description": "Native・WASM・browserで使う照合集合。各形式の期待値は元ファイルに保持する。",
+  "suites": [
+    {"path": "cases.json", "format": "case-corpus"},
+    {"path": "machine_cases.json", "format": "case-corpus"},
+    {"path": "spec.json", "format": "hand-written-spec"}
+  ]
+}

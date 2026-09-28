@@ -1,0 +1,36 @@
+[package]
+name = "azaori"
+version = "0.1.0"
+edition = "2021"
+description = "AZAORI native and WebAssembly interpreter"
+license = "MIT"
+readme = "README.md"
+rust-version = "1.87"
+# 検証データ（conformance/）が大きいので crates.io には出さない
+publish = false
+
+[lib]
+crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "azaori"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+num-bigint = { version = "0.4", features = ["serde", "rand"] }
+num-traits = "0.2"
+num-integer = "0.1"
+num-rational = "0.4"
+rand = "0.8"
+unicode-normalization = "0.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+chrono = "0.4"
+unicode-width = "0.2"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
