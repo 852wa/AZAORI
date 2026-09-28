@@ -121,6 +121,8 @@ test('virtual files accept prototype names and outside services reject inherited
     postMessage: value => messages.push(value),
   };
   context.self = context;
+  // wasm-worker.js は pkg を azaori という名前でまとめて読み込む
+  context.azaori = {analyze: context.analyze, execute: context.execute, last_panic: () => ''};
   vm.createContext(context);
   const code = fs.readFileSync(path.join(root, 'wasm-worker.js'), 'utf8').replace(/^import .*;\s*/m, '');
   vm.runInContext(code, context);
